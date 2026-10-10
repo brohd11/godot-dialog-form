@@ -2,7 +2,7 @@
 class_name DialogForm
 extends Dialogs.Base.General
 
-const LineEditField = preload("uid://bxvuen4rcwrpg") # line_edit.gd
+const LineEditField = preload("uid://cb6uaovp8vguo") # line_edit.gd
 const BoolField = preload("uid://dkgl215oxf3kk") # bool.gd
 
 #const Fields = preload("uid://bpwpdxgcin350") # fields.gd
@@ -32,7 +32,7 @@ func add_bool(_name, icon=null, default:=false, target:TargetSection=TargetSecti
 	}
 
 
-func show_dialog():
+func show_dialog() -> Response:
 	_build_dialog()
 	_build_fields()
 	dialog.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_SCREEN_WITH_MOUSE_FOCUS
@@ -112,7 +112,7 @@ static func was_cancelled(result:Dialogs.Response):
 	return result.cancelled
 
 # builders
-static func construct_and_display(form_data:Dictionary, _root_node=null):
+static func construct_and_display(form_data:Dictionary, _root_node=null) -> Response:
 	var form = new(form_data, _root_node)
 	return await form.show_dialog()
 
