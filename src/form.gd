@@ -5,12 +5,6 @@ extends Dialogs.Base.General
 const LineEditField = preload("uid://cb6uaovp8vguo") # line_edit.gd
 const BoolField = preload("uid://dkgl215oxf3kk") # bool.gd
 
-#const Fields = preload("uid://bpwpdxgcin350") # fields.gd
-#enum FieldType {
-	#BOOL,
-	#LINE_EDIT,
-	#OPTION
-#}
 
 var _form_build_data = {}
 var constructed_data = {}
