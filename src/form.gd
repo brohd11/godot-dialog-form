@@ -30,11 +30,12 @@ func show_dialog() -> Response:
 	_build_dialog()
 	_build_fields()
 	dialog.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_SCREEN_WITH_MOUSE_FOCUS
-	Engine.get_main_loop().root.add_child(dialog)
+	root_node.add_child(dialog)
 	
-	var first_field = constructed_data.values()[0]
-	if first_field is LineEditField:
-		first_field.line_edit.grab_focus()
+	if not constructed_data.is_empty():
+		var first_field = constructed_data.values()[0]
+		if first_field is LineEditField:
+			first_field.line_edit.grab_focus()
 	return await handled
 
 
@@ -58,9 +59,7 @@ func get_data():
 	for _name in constructed_data.keys():
 		var control = constructed_data[_name]
 		var build_data = _form_build_data.get(_name)
-		if not build_data:
-			continue
-		var type = build_data.get(Keys.TYPE)
+		var type = build_data.get(Keys.TYPE) if build_data is Dictionary else null
 		var val
 		if type == null:
 			val = control
@@ -89,11 +88,16 @@ func _add_field(_name, data):
 	var control
 	if type == "bool":
 		control = BoolField.get_check(_name, icon)
+		control.button_pressed = data.get(Keys.DEFAULT, false)
 	elif type == "LineEdit":
-		var placeholder = data.get("placeholder", "")
+		var placeholder = data.get(Keys.PLACEHOLDER, "")
 		control = LineEditField.new(_name, placeholder, icon)
+		control.line_edit.text = str(data.get(Keys.DEFAULT, ""))
+	else:
+		push_error("DialogForm: field '%s' has unknown type '%s'" % [_name, type])
+		return null
 	
-	var target = data.get(Keys.TARGET, TargetSection.BODY)
+	var target = data.get(Keys.TARGET, data.get(&"target", TargetSection.BODY))
 	match target:
 		TargetSection.HEADER: dialog.header.add_child(control)
 		TargetSection.BODY: dialog.body.add_child(control)
@@ -115,7 +119,7 @@ class Data:
 	static func new_data(params:={}) -> Dictionary:
 		return params
 	
-	#! keys placeholder:String target_section:TargetSection
+	#! keys placeholder:String default:String target_section:TargetSection
 	static func line_edit(params:={}):
 		params["type"] = "LineEdit"
 		return params
@@ -132,4 +136,5 @@ class Keys:
 	const ICON = &"icon"
 	const TYPE = &"type"
 	const DEFAULT = &"default"
-	const TARGET = &"target"
+	const PLACEHOLDER = &"placeholder"
+	const TARGET = &"target_section"
